@@ -1,0 +1,14 @@
+target: hellounit hellomain
+
+CFLAGS: -Wall -O3 -pedantic
+LDLIBS: -lm
+
+hellounit: hellounit.o
+	gcc -o $@ $(LDLIBS)
+hellomain: hellomain.o
+	gcc -o $@ $(LDLIBS)
+
+hellounit.o: hellounit.c
+	gcc $(CFLAGS) -c $^ -o $@ 
+hellomain.o: hellomain.c
+	gcc $(CFLAGS) -c $^ -o $@
