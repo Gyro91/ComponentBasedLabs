@@ -1,9 +1,0 @@
-#ifndef __hellounit_h__
-#define __hellounit_h__
-
-#include "assert.h"
-
-#endif
-
-extern void init();
-extern void f();
