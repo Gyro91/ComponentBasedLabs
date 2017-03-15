@@ -1,1 +1,4 @@
 gcc -o hellounit.so -fPIC -shared hellounit.c
+
+gcc -o libhellounit.so -fPIC -shared hellounit.c -lm
+gcc -Wall mainnodll.c -o mainNodll -lm -ldl

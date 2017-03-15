@@ -1,0 +1,3 @@
+gcc -o libinterfaceImpl.so -fPIC -shared interfaceImpl.c -lm
+gcc -Wall main.c -o main -lm -ldl
+
