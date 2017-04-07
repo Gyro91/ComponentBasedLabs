@@ -1,0 +1,17 @@
+Taskset:
+(2, 7, 7)
+(3, 12, 12)
+(4, 21, 21)
+T0 scheduling points (1):  7
+	7 -> dbf = 2; sbf = 1
+		Schedulable: 0
+T1 scheduling points (2):  12 7
+	12 -> dbf = 7; sbf = 4
+	7 -> dbf = 5; sbf = 1
+		Schedulable: 0
+T2 scheduling points (4):  21 7 14 12
+	21 -> dbf = 16; sbf = 9
+	7 -> dbf = 9; sbf = 1
+	14 -> dbf = 14; sbf = 5
+	12 -> dbf = 11; sbf = 4
+		Schedulable: 0

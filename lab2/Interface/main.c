@@ -1,6 +1,6 @@
 #include <dlfcn.h>
 #include <stdio.h>
-#include "interfaceImpl.h"
+#include "interface.h"
 
 interface *(*get_des)(void);
 

@@ -1,0 +1,79 @@
+ 1913  emacs dbf.c &
+ 1914  make
+ 1915  ./sbf_test 
+ 1916  ./sbf_test 4 10
+ 1917  ./sbf_test 4 10 > log.txt
+ 1918  gnuplot
+ 1919  ./tda_test TSs/ts1.txt
+ 1920  ./h_test 
+ 1921  ./h_test  TSs/ts1.txt
+ 1922  ./h_test  TSs/ts1.txt 4 7
+ 1923  ./h_test  TSs/ts1.txt 5 7
+ 1924  hollywood
+ 1925  ls
+ 1926  sudo apt-get update
+ 1927  cd CBSD/
+ 1928  ls
+ 1929  cd H-Analysis/
+ 1930  ls
+ 1931  emacs *.h &
+ 1932  emacs dbf.h &
+ 1933  emacs dbf.c &
+ 1934  emacs sbf_test.c &
+ 1935  gnuplot
+ 1936  ls
+ 1937  emacs tda_test.c &
+ 1938  emacs dbf.c &
+ 1939  ls
+ 1940  emacs my_script.sh &
+ 1941  chmod +rx my_script.sh 
+ 1942  ./my_script.sh 
+ 1943  ls
+ 1944  ./h_test 
+ 1945  ./my_script.sh 
+ 1946  ./h_test TSs/ts1.txt 4 7 > log.txt 
+ 1947  ls
+ 1948  cat log.txt 
+ 1949  tail -1 log.txt 
+ 1950  sed -r 's/.* ([0-9]+\.*[0-9]*).*?/\1/' mylog.txt  > outfile.txt
+ 1951  ls
+ 1952  ./my_script.sh 
+ 1953  sed -r 's/.* ([0-9]+\.*[0-9]*).*?/\1/' mylog.txt  > outfile.txt
+ 1954  ls
+ 1955  ./my_script.sh 
+ 1956  ls
+ 1957  cat outfile.txt 
+ 1958  ./my_script.sh 
+ 1959  ls
+ 1960  cd ..
+ 1961  ls
+ 1962  du -h *.gz
+ 1963  du -h bzImage 
+ 1964  cat start_qemu.sh 
+ 1965  sudo su
+ 1966  ls
+ 1967  ./start_qemu.sh
+ 1968  sh start_qemu.sh 
+ 1969  ps ax
+ 1970  H
+ 1971  ps ax
+ 1972  top -p 7150
+ 1973  sudo chrt -p 99 7150
+ 1974  top -p 7150
+ 1975  cd chdl/
+ 1976  ls
+ 1977  sudo ./chdl 7150 10000 15000
+ 1978  echo 1039672
+ 1979  /usr/bin/hollywood
+ 1980  ls
+ 1981  cd Component-labs/
+ 1982  ls
+ 1983  cd lab3
+ 1984  ls
+ 1985  cd CBSD
+ 1986  ls
+ 1987  cd H-Analysis/
+ 1988  ls
+ 1989  gedit *.c &
+ 1990  gedit *.h &
+

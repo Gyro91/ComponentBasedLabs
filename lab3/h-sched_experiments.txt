@@ -1,0 +1,114 @@
+	Some Experiments wit Hierarchical Scheduling on Linux
+
+This is a short and informal description of how to use the material
+distributed at http://retis.santannapisa.it/~luca/CBSD to run some
+experiments with hierarchical scheduling using Linux, KVM and SCHED_DEADLINE.
+
+SCHED_DEADLINE is an implementation of the (hard) CBS algorithm for the
+Linux kernel, allowing users to assign a maximum budged and a reservation
+period (see the CBS algorithm) to a specified thread (or single-threaded
+process).
+
+KVM (Kernel Virtual Machine) is a Linux kernel module allowing to use the
+hardware virtualisation features (ring -1, etc) provided by modern CPUs. It
+can be used by the user-space "qemu" VMM (so, it can be seen as a type 2
+hypervisor).
+
+
+How to reproduce the experiments:
+1) Download http://retis.santannapisa.it/~luca/CBSD/cbsd-lab1.1.tgz and
+   uncompress it somewhere. A directory called "CBSD" will be created.
+   The "CBSD" directory contains:
+   - A set of programs to do time-demand analysis and hierarchical scheduling
+     analysis (H-Analysis)
+   - An application that allows to create a set of periodic threads scheduled
+     by fixed priorities, specifying the WCET, the period and the priority
+     for each thread (PeriodicTask/periodic_thread)
+   - A small program allowing to change the scheduling policy of a task to
+     SCHED_DEADLINE (chdl)
+   - An image of the Linux kernel compiled for x86_64 (bzImage) and a small
+     initramfs containing the periodic_thread program (periodic_test.gz)
+   - A script to easily start KVM
+2) First of all, enter the H-Analysis directory and build the analysis
+   tools (type "make"). You can now use:
+   - sbf_test to print the supplied bound function for a periodic server
+     with given parameters
+   - tda_test to check the schedulability of a taskset (see the examples
+     in "TSs") with a fixed priority scheduler. The program prints a lot
+     of information about the scheduling points, the demand bound function
+     (workload) for each task in the various points, etc...
+   - h_test to check the schedulability of a taskset with a periodic server
+     having the specified parameters.
+   Exercises:
+   a) Try to plot the sbf for a periodic server; then, use sbf_test to
+      generate it and compare your plot with the output of sbf_test.
+      Hint: you can use "./sbf_test 8 12 > sbf_8_12.txt" to save the
+      sbf of an (8,12) periodic server in "sbf_8_12.txt", and you can
+      use gnuplot ("plot 'sbf_8_12.txt'") to plot it.
+      Try with different values of Qs and Ts.
+   b) Check the schedulability of various tasksets. Compare your
+      analysis with the results printed by tda_test
+   c) Check the schedulability of the previous tasksets with a periodic
+      server having various parameters. Compare your analysis with the
+      results printed by h_test
+   d) Write a simple script (or program) that given a tasksets checks its
+      schedulability with a periodic server having various parameters,
+      printing the values (Qs,Ts) that make the taskset schedulable
+3) Now, look at the "PeriodicTask" directory. It contains the source code
+   for "periodic_thread" (included in the test initramfs).
+   This program allows to create a set of periodic threads with given
+   execution times and periods.
+   Each threads executes for a fixed amount of time using a busy loop
+   (counting from 0 to N), so the program must know how much to count in
+   order to consume a known amount of time. This is measured in a
+   "calibration" phase before starting the periodic threads (see
+   cpu_consume.c). This strategy works well when the calibration loop
+   is scheduled with the highest priority in the system, but calibration
+   will be unreliable when the calibration loop is scheduled by a (hard)
+   CBS. In that case, the "-R" command line option will have to be used
+   (see the handling of "cnt" in periodic_thread.c).
+4) Before starting the VM, one last thing: the hardware speed must be
+   forced to be a little bit more predictable. To do so, type:
+	sudo su
+	cd /sys/devices/system/cpu/intel_pstate
+	echo 1 > min_perf_pct
+	echo 1 > max_perf_pct
+	echo 1 > no_turbo
+   (note: writing "1" in *_perf_pct will slow down your CPU... If your
+    CPU is already slow, use a larger value - between 1 and 100. The
+    important thing is to make sure that min_perf_pct and max_perf_pct
+    contain the same value)
+5) Start the VM with "sh start_qemu.sh". It will print the PID of the
+   qemu process and the id of the vCPU thread (the one to be scheduled
+   with SCHED_DEADLINE).
+   Inside the VM, go to /Test ("cd /Test") and start a periodic taskset
+   ("sh ts_parse.sh TSs/ts3.txt"). In the host, run "top -p <PID>", where
+   the PID is printed by "start_qemu.sh", then press "H" (capital "H")
+   and look at the thread that is consuming more CPU time... It should
+   be the vCPU thread with the id printed by "start_qemu.sh". This is the
+   thread for which we need to set the scheduling parameters. First of all,
+   run it with the highest real-time priority, to calibrate the CPU
+	sudo chrt -p 99 <vCPU id>
+   and restart the periodic threads in the VM:
+	sh ts_parse.sh TSs/ts3.txt > log.txt
+6) Now, it is time to use SCHED_DEADLINE... Look at the "log.txt" file you
+   just created: it should contain a "Cycles = <nnnnn>" line. Save the
+   "<nnnnn>" value somewhere. Open the "ts_parse.sh" file, search a
+   commented "echo -n " -R xxxxx"" line, change "xxxxx" with the value you
+   just saved and uncomment the line.
+   In the host, change the scheduling policy of the vCPU thread
+	sudo chdl/chdl <vCPU id> 10000 15000
+   (notice: Qs and Ts are expressed in microseconds).
+   At this point, you can restart the periodic threads, saving the results:
+	sh ts_parse.sh TSs/ts3.txt > log_rsv.txt
+   When the program finishes, look at the results in "log_rsv.txt".
+   The 4th columns indicates the response time for all the jobs J_{i,k}
+   (first column: task index i; second column: job index k) and the last
+   column is negative if the deadline is respected.
+   Check that all of the values are negative.
+7) Change the periodic server parameters to something not schedulable
+	sudo chdl/chdl <vCPU id> 9000 15000
+   run the periodic threads again
+	sh ts_parse.sh TSs/ts3.txt > log_rsv_bad.txt
+   and check that "log_rsv_bad.txt" contains some missed deadlines (positive
+   values in the last column).
